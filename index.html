@@ -3,293 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>龙之书 自助指令抽取</title>
+    <title>Arcana Draw · 跑团抽取器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            width: 100%;
-        }
-        
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 2em;
-        }
-        
-        .deck-selector {
-            margin: 20px 0;
-        }
-        
-        .deck-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .deck-btn {
-            padding: 12px;
-            border: 2px solid #667eea;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        
-        .deck-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .draw-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            cursor: pointer;
-            margin: 20px 0;
-            transition: transform 0.3s;
-        }
-        
-        .draw-btn:hover:not(:disabled) {
-            transform: scale(1.02);
-        }
-        
-        .draw-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        .result-area {
-            min-height: 100px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-top: 20px;
-            border: 2px dashed #ddd;
-        }
-        
-        .result-card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            display: none;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-            
-            h1 {
-                font-size: 1.5em;
-            }
-            
-            .deck-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        /* 基础重置和样式将在下面详细提供 */
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎲 自助指令抽取</h1>
-        
-        <div class="deck-selector">
-            <h3>选择牌堆：</h3>
-            <div class="deck-grid" id="deckList">
-                <!-- 牌堆按钮会在这里生成 -->
+    <div class="app-container">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <div class="logo">
+                    <i class="fas fa-dice-d20"></i>
+                    <span>Arcana Draw</span>
+                </div>
+                <div class="nav-subtitle">高级跑团牌堆抽取系统</div>
             </div>
-        </div>
-        
-        <button class="draw-btn" id="drawBtn" disabled>请先选择牌堆</button>
-        
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>正在抽取中...</p>
-        </div>
-        
-        <div class="result-area" id="resultArea">
-            <p style="color: #999; text-align: center;">抽卡结果将显示在这里</p>
-        </div>
+            <div class="nav-actions">
+                <button class="btn-icon" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="btn-icon" id="settingsToggle">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 左侧控制面板 -->
+            <aside class="control-panel">
+                <div class="panel-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-layer-group"></i>
+                        <span>牌堆选择</span>
+                    </h3>
+                    <div class="deck-selector">
+                        <div class="select-wrapper">
+                            <i class="fas fa-chevron-down"></i>
+                            <select id="deckSelect" class="styled-select">
+                                <option value="">选择牌堆...</option>
+                            </select>
+                        </div>
+                        <div class="deck-info">
+                            <div class="deck-meta">
+                                <span class="deck-count" id="deckCount">0张</span>
+                                <span class="deck-desc" id="deckDesc"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>抽取设置</span>
+                    </h3>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label class="setting-label">抽取数量</label>
+                            <div class="number-input">
+                                <button class="number-decrement">−</button>
+                                <input type="number" id="drawCount" value="1" min="1" max="10">
+                                <button class="number-increment">+</button>
+                            </div>
+                            <div class="quick-numbers">
+                                <button class="chip" data-count="1">1</button>
+                                <button class="chip" data-count="3">3</button>
+                                <button class="chip" data-count="5">5</button>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">抽取模式</label>
+                            <div class="toggle-group">
+                                <label class="toggle">
+                                    <input type="checkbox" id="allowDuplicates" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label">允许重复</span>
+                                </label>
+                                <label class="toggle">
+                                    <input type="checkbox" id="autoReshuffle">
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label">自动洗牌</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-magic"></i>
+                        <span>抽取控制</span>
+                    </h3>
+                    <div class="action-buttons">
+                        <button id="drawButton" class="btn-primary btn-large">
+                            <i class="fas fa-hand-sparkles"></i>
+                            <span>抽取卡片</span>
+                        </button>
+                        <div class="btn-group">
+                            <button id="shuffleButton" class="btn-secondary">
+                                <i class="fas fa-random"></i>
+                                <span>洗牌</span>
+                            </button>
+                            <button id="clearButton" class="btn-secondary">
+                                <i class="fas fa-trash-alt"></i>
+                                <span>清空</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section stats-panel">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        <span>统计数据</span>
+                    </h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalDraws">0</div>
+                            <div class="stat-label">总抽取</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="uniqueDraws">0</div>
+                            <div class="stat-label">唯一卡牌</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="deckRemaining">0</div>
+                            <div class="stat-label">剩余卡牌</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 右侧结果区域 -->
+            <div class="results-area">
+                <!-- 结果标题 -->
+                <div class="results-header">
+                    <div>
+                        <h2 class="results-title">
+                            <i class="fas fa-scroll"></i>
+                            <span>抽取结果</span>
+                        </h2>
+                        <div class="results-subtitle" id="resultsInfo">选择牌堆开始抽取</div>
+                    </div>
+                    <div class="results-actions">
+                        <button class="btn-icon" id="exportResults">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="btn-icon" id="shareResults">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 卡片展示区域 -->
+                <div class="cards-container" id="cardsContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-dice"></i>
+                        </div>
+                        <h3 class="empty-title">准备抽取</h3>
+                        <p class="empty-desc">选择一个牌堆并点击抽取按钮开始</p>
+                    </div>
+                </div>
+
+                <!-- 指令输入 -->
+                <div class="command-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-terminal"></i>
+                        <span>快速指令</span>
+                    </h3>
+                    <div class="command-input-wrapper">
+                        <div class="command-prefix">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <input type="text" 
+                               id="commandInput" 
+                               class="command-input"
+                               placeholder="输入指令，如: .draw combat 或 .draw treasure 3"
+                               autocomplete="off">
+                        <button id="executeCommand" class="btn-icon">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="quick-commands">
+                        <button class="command-chip" data-cmd=".draw combat">
+                            .draw combat
+                        </button>
+                        <button class="command-chip" data-cmd=".draw encounter">
+                            .draw encounter
+                        </button>
+                        <button class="command-chip" data-cmd=".draw treasure">
+                            .draw treasure
+                        </button>
+                        <button class="command-chip" data-cmd=".shuffle">
+                            .shuffle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 历史记录 -->
+                <div class="history-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-history"></i>
+                        <span>抽取历史</span>
+                    </h3>
+                    <div class="history-list" id="historyList">
+                        <div class="history-empty">
+                            <i class="fas fa-clock"></i>
+                            <span>暂无历史记录</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部状态栏 -->
+        <footer class="status-bar">
+            <div class="status-left">
+                <span class="status-item">
+                    <i class="fas fa-bolt"></i>
+                    <span id="statusText">就绪</span>
+                </span>
+                <span class="status-item">
+                    <i class="fas fa-database"></i>
+                    <span id="deckStatus">未选择牌堆</span>
+                </span>
+            </div>
+            <div class="status-right">
+                <a href="#" class="status-link" id="importData">
+                    <i class="fas fa-file-import"></i>
+                    <span>导入</span>
+                </a>
+                <a href="#" class="status-link" id="exportData">
+                    <i class="fas fa-file-export"></i>
+                    <span>导出</span>
+                </a>
+                <a href="https://github.com" target="_blank" class="status-link">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 模态框等组件 -->
+    <div id="importModal" class="modal">
+        <!-- 导入模态框内容 -->
     </div>
 
     <script>
-        // 牌堆数据 - 稍后从 decks.json 加载
-        let decks = {};
-        let selectedDeck = null;
-        
-        // 页面加载完成后执行
-        window.onload = async function() {
-            console.log('抽卡系统正在启动...');
-            
-            try {
-                // 加载牌堆数据
-                const response = await fetch('decks.json');
-                decks = await response.json();
-                console.log('牌堆加载成功:', Object.keys(decks).length, '个牌堆');
-                
-                // 生成牌堆按钮
-                renderDeckList();
-            } catch (error) {
-                console.error('加载牌堆失败:', error);
-                // 使用示例数据
-                decks = {
-                    "示例牌堆": ["示例卡片1", "示例卡片2", "示例卡片3"]
-                };
-                renderDeckList();
-                alert('正在使用示例数据，请确保decks.json文件存在');
-            }
-        };
-        
-        // 生成牌堆按钮
-        function renderDeckList() {
-            const deckList = document.getElementById('deckList');
-            deckList.innerHTML = '';
-            
-            Object.keys(decks).forEach(deckName => {
-                const button = document.createElement('button');
-                button.className = 'deck-btn';
-                button.textContent = `${deckName} (${decks[deckName].length}张)`;
-                button.onclick = () => selectDeck(deckName);
-                deckList.appendChild(button);
-            });
-        }
-        
-        // 选择牌堆
-        function selectDeck(deckName) {
-            selectedDeck = deckName;
-            
-            // 移除所有按钮的选中状态
-            document.querySelectorAll('.deck-btn').forEach(btn => {
-                btn.style.background = 'white';
-                btn.style.color = '#333';
-            });
-            
-            // 设置当前按钮为选中状态
-            event.target.style.background = '#667eea';
-            event.target.style.color = 'white';
-            
-            // 更新抽卡按钮
-            const drawBtn = document.getElementById('drawBtn');
-            drawBtn.disabled = false;
-            drawBtn.textContent = `抽取【${deckName}】`;
-        }
-        
-        // 抽卡
-        function drawCard() {
-            if (!selectedDeck) return;
-            
-            const cards = decks[selectedDeck];
-            if (cards.length === 0) return;
-            
-            // 显示加载动画
-            const loading = document.getElementById('loading');
-            const drawBtn = document.getElementById('drawBtn');
-            loading.style.display = 'block';
-            drawBtn.disabled = true;
-            
-            // 模拟抽卡延迟
-            setTimeout(() => {
-                const randomIndex = Math.floor(Math.random() * cards.length);
-                const card = cards[randomIndex];
-                
-                // 隐藏加载动画
-                loading.style.display = 'none';
-                drawBtn.disabled = false;
-                
-                // 显示结果
-                showResult(card);
-            }, 800);
-        }
-        
-        // 显示结果
-        function showResult(card) {
-            const resultArea = document.getElementById('resultArea');
-            
-            // 创建结果卡片
-            const resultCard = document.createElement('div');
-            resultCard.className = 'result-card';
-            resultCard.innerHTML = `
-                <strong>【${selectedDeck}】</strong><br>
-                ${card}<br>
-                <small style="color: #666; display: block; margin-top: 5px;">
-                    🕐 ${new Date().toLocaleTimeString()}
-                </small>
-            `;
-            
-            // 移除提示文字
-            if (resultArea.children[0]?.style?.color === '#999') {
-                resultArea.innerHTML = '';
-            }
-            
-            // 添加到最前面
-            resultArea.insertBefore(resultCard, resultArea.firstChild);
-            
-            // 限制最多显示5条
-            const children = resultArea.children;
-            if (children.length > 5) {
-                resultArea.removeChild(children[children.length - 1]);
-            }
-        }
-        
-        // 绑定抽卡按钮点击事件
-        document.getElementById('drawBtn').addEventListener('click', drawCard);
-        
-        // 添加键盘快捷键（空格键抽卡）
-        document.addEventListener('keydown', function(e) {
-            if (e.code === 'Space' && !document.getElementById('drawBtn').disabled) {
-                drawCard();
-                e.preventDefault(); // 防止空格滚动页面
-            }
-        });
+        // JavaScript 代码将在下面提供
     </script>
 </body>
 </html>
