@@ -3,263 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcana Draw · 跑团抽取器</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        /* 基础重置和样式将在下面详细提供 */
-    </style>
+    <title>TRPG 牌堆抽取系统</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <!-- 导航栏 -->
-        <nav class="navbar">
-            <div class="nav-brand">
-                <div class="logo">
-                    <i class="fas fa-dice-d20"></i>
-                    <span>Arcana Draw</span>
+    <div class="container">
+        <!-- 顶部装饰 -->
+        <div class="header">
+            <div class="magic-circle"></div>
+            <h1><i class="fas fa-dice-d20"></i> 临时指令抽取</h1>
+            <div class="magic-circle"></div>
+        </div>
+
+        <!-- 主指令区 -->
+        <div class="command-section">
+            <div class="command-input-wrapper">
+                <div class="command-prefix">
+                    <span class="terminal-sign">$</span>
+                    <span class="prompt">draw></span>
                 </div>
-                <div class="nav-subtitle">高级跑团牌堆抽取系统</div>
-            </div>
-            <div class="nav-actions">
-                <button class="btn-icon" id="themeToggle">
-                    <i class="fas fa-moon"></i>
+                <input 
+                    type="text" 
+                    id="commandInput" 
+                    class="command-input"
+                    placeholder="输入 .draw [牌堆名称] 进行抽取..."
+                    autocomplete="off"
+                    autofocus
+                >
+                <button id="submitBtn" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
-                <button class="btn-icon" id="settingsToggle">
-                    <i class="fas fa-cog"></i>
+            </div>
+            
+            <!-- 命令提示 -->
+            <div class="command-hints">
+                <div class="hint-tag" data-command=".draw events">.draw events</div>
+                <div class="hint-tag" data-command=".draw results">.draw results</div>
+                <div class="hint-tag" data-command=".draw items">.draw items</div>
+                <!-- 添加更多牌堆提示 -->
+            </div>
+        </div>
+
+        <!-- 抽取结果展示区 -->
+        <div class="results-section">
+            <div class="section-header">
+                <h2><i class="fas fa-scroll"></i> 抽取结果</h2>
+                <button id="clearHistory" class="clear-btn">
+                    <i class="fas fa-trash-alt"></i> 清空记录
                 </button>
             </div>
-        </nav>
-
-        <!-- 主内容区域 -->
-        <main class="main-content">
-            <!-- 左侧控制面板 -->
-            <aside class="control-panel">
-                <div class="panel-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-layer-group"></i>
-                        <span>牌堆选择</span>
-                    </h3>
-                    <div class="deck-selector">
-                        <div class="select-wrapper">
-                            <i class="fas fa-chevron-down"></i>
-                            <select id="deckSelect" class="styled-select">
-                                <option value="">选择牌堆...</option>
-                            </select>
-                        </div>
-                        <div class="deck-info">
-                            <div class="deck-meta">
-                                <span class="deck-count" id="deckCount">0张</span>
-                                <span class="deck-desc" id="deckDesc"></span>
-                            </div>
-                        </div>
+            
+            <div class="card-display-area">
+                <!-- 最新卡片会动态插入到这里 -->
+                <div class="welcome-card">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle"></i> 欢迎使用
                     </div>
-                </div>
-
-                <div class="panel-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-sliders-h"></i>
-                        <span>抽取设置</span>
-                    </h3>
-                    <div class="settings-grid">
-                        <div class="setting-item">
-                            <label class="setting-label">抽取数量</label>
-                            <div class="number-input">
-                                <button class="number-decrement">−</button>
-                                <input type="number" id="drawCount" value="1" min="1" max="10">
-                                <button class="number-increment">+</button>
-                            </div>
-                            <div class="quick-numbers">
-                                <button class="chip" data-count="1">1</button>
-                                <button class="chip" data-count="3">3</button>
-                                <button class="chip" data-count="5">5</button>
-                            </div>
-                        </div>
-                        
-                        <div class="setting-item">
-                            <label class="setting-label">抽取模式</label>
-                            <div class="toggle-group">
-                                <label class="toggle">
-                                    <input type="checkbox" id="allowDuplicates" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="toggle-label">允许重复</span>
-                                </label>
-                                <label class="toggle">
-                                    <input type="checkbox" id="autoReshuffle">
-                                    <span class="toggle-slider"></span>
-                                    <span class="toggle-label">自动洗牌</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-magic"></i>
-                        <span>抽取控制</span>
-                    </h3>
-                    <div class="action-buttons">
-                        <button id="drawButton" class="btn-primary btn-large">
-                            <i class="fas fa-hand-sparkles"></i>
-                            <span>抽取卡片</span>
-                        </button>
-                        <div class="btn-group">
-                            <button id="shuffleButton" class="btn-secondary">
-                                <i class="fas fa-random"></i>
-                                <span>洗牌</span>
-                            </button>
-                            <button id="clearButton" class="btn-secondary">
-                                <i class="fas fa-trash-alt"></i>
-                                <span>清空</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel-section stats-panel">
-                    <h3 class="section-title">
-                        <i class="fas fa-chart-line"></i>
-                        <span>统计数据</span>
-                    </h3>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-value" id="totalDraws">0</div>
-                            <div class="stat-label">总抽取</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="uniqueDraws">0</div>
-                            <div class="stat-label">唯一卡牌</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="deckRemaining">0</div>
-                            <div class="stat-label">剩余卡牌</div>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- 右侧结果区域 -->
-            <div class="results-area">
-                <!-- 结果标题 -->
-                <div class="results-header">
-                    <div>
-                        <h2 class="results-title">
-                            <i class="fas fa-scroll"></i>
-                            <span>抽取结果</span>
-                        </h2>
-                        <div class="results-subtitle" id="resultsInfo">选择牌堆开始抽取</div>
-                    </div>
-                    <div class="results-actions">
-                        <button class="btn-icon" id="exportResults">
-                            <i class="fas fa-download"></i>
-                        </button>
-                        <button class="btn-icon" id="shareResults">
-                            <i class="fas fa-share-alt"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 卡片展示区域 -->
-                <div class="cards-container" id="cardsContainer">
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-dice"></i>
-                        </div>
-                        <h3 class="empty-title">准备抽取</h3>
-                        <p class="empty-desc">选择一个牌堆并点击抽取按钮开始</p>
-                    </div>
-                </div>
-
-                <!-- 指令输入 -->
-                <div class="command-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-terminal"></i>
-                        <span>快速指令</span>
-                    </h3>
-                    <div class="command-input-wrapper">
-                        <div class="command-prefix">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                        <input type="text" 
-                               id="commandInput" 
-                               class="command-input"
-                               placeholder="输入指令，如: .draw combat 或 .draw treasure 3"
-                               autocomplete="off">
-                        <button id="executeCommand" class="btn-icon">
-                            <i class="fas fa-play"></i>
-                        </button>
-                    </div>
-                    <div class="quick-commands">
-                        <button class="command-chip" data-cmd=".draw combat">
-                            .draw combat
-                        </button>
-                        <button class="command-chip" data-cmd=".draw encounter">
-                            .draw encounter
-                        </button>
-                        <button class="command-chip" data-cmd=".draw treasure">
-                            .draw treasure
-                        </button>
-                        <button class="command-chip" data-cmd=".shuffle">
-                            .shuffle
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 历史记录 -->
-                <div class="history-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-history"></i>
-                        <span>抽取历史</span>
-                    </h3>
-                    <div class="history-list" id="historyList">
-                        <div class="history-empty">
-                            <i class="fas fa-clock"></i>
-                            <span>暂无历史记录</span>
-                        </div>
+                    <div class="card-content">
+                        输入 .draw 指令开始抽取牌堆内容<br>
+                        例如: <code>.draw events</code>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
 
-        <!-- 底部状态栏 -->
-        <footer class="status-bar">
-            <div class="status-left">
-                <span class="status-item">
-                    <i class="fas fa-bolt"></i>
-                    <span id="statusText">就绪</span>
-                </span>
-                <span class="status-item">
-                    <i class="fas fa-database"></i>
-                    <span id="deckStatus">未选择牌堆</span>
-                </span>
+        <!-- 历史记录 -->
+        <div class="history-section">
+            <h2><i class="fas fa-history"></i> 抽取记录 <span id="historyCount">0</span></h2>
+            <div id="historyList" class="history-list">
+                <!-- 历史记录会动态插入 -->
             </div>
-            <div class="status-right">
-                <a href="#" class="status-link" id="importData">
-                    <i class="fas fa-file-import"></i>
-                    <span>导入</span>
-                </a>
-                <a href="#" class="status-link" id="exportData">
-                    <i class="fas fa-file-export"></i>
-                    <span>导出</span>
-                </a>
-                <a href="https://github.com" target="_blank" class="status-link">
-                    <i class="fab fa-github"></i>
-                    <span>GitHub</span>
-                </a>
+        </div>
+
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="status-item">
+                <i class="fas fa-database"></i>
+                <span id="deckCount">加载中...</span>
             </div>
-        </footer>
+            <div class="status-item">
+                <i class="fas fa-bolt"></i>
+                <span>在线</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-user"></i>
+                <span id="sessionCount">0</span> 次抽取
+            </div>
+        </div>
     </div>
 
-    <!-- 模态框等组件 -->
-    <div id="importModal" class="modal">
-        <!-- 导入模态框内容 -->
-    </div>
+    <!-- 卡片模板 -->
+    <template id="cardTemplate">
+        <div class="result-card">
+            <div class="card-header">
+                <span class="deck-name"></span>
+                <span class="card-time"></span>
+            </div>
+            <div class="card-content"></div>
+            <div class="card-footer">
+                <i class="fas fa-hashtag"></i>
+                <span class="card-index"></span>
+            </div>
+        </div>
+    </template>
 
-    <script>
-        // JavaScript 代码将在下面提供
-    </script>
+    <!-- 历史记录模板 -->
+    <template id="historyTemplate">
+        <div class="history-item">
+            <span class="history-time"></span>
+            <span class="history-command"></span>
+            <span class="history-result"></span>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
 </body>
 </html>
