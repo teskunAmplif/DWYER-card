@@ -3,121 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRPG 牌堆抽取系统</title>
+    <title>临时堆抽取系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- 顶部装饰 -->
-        <div class="header">
-            <div class="magic-circle"></div>
-            <h1><i class="fas fa-dice-d20"></i> 临时指令抽取</h1>
-            <div class="magic-circle"></div>
-        </div>
+        <!-- 顶部标题区 -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-dice-d20"></i>
+                <h1>跑团牌堆抽取系统</h1>
+            </div>
+            <div class="stats">
+                <span class="stat-item"><i class="fas fa-history"></i> 抽取次数: <span id="draw-count">0</span></span>
+                <span class="stat-item"><i class="fas fa-layer-group"></i> 已加载牌堆: <span id="deck-count">0</span></span>
+            </div>
+        </header>
 
-        <!-- 主指令区 -->
-        <div class="command-section">
-            <div class="command-input-wrapper">
-                <div class="command-prefix">
-                    <span class="terminal-sign">$</span>
-                    <span class="prompt">draw></span>
-                </div>
-                <input 
-                    type="text" 
-                    id="commandInput" 
-                    class="command-input"
-                    placeholder="输入 .draw [牌堆名称] 进行抽取..."
-                    autocomplete="off"
-                    autofocus
-                >
-                <button id="submitBtn" class="submit-btn">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-            
-            <!-- 命令提示 -->
-            <div class="command-hints">
-                <div class="hint-tag" data-command=".draw events">.draw events</div>
-                <div class="hint-tag" data-command=".draw results">.draw results</div>
-                <div class="hint-tag" data-command=".draw items">.draw items</div>
-                <!-- 添加更多牌堆提示 -->
-            </div>
-        </div>
-
-        <!-- 抽取结果展示区 -->
-        <div class="results-section">
-            <div class="section-header">
-                <h2><i class="fas fa-scroll"></i> 抽取结果</h2>
-                <button id="clearHistory" class="clear-btn">
-                    <i class="fas fa-trash-alt"></i> 清空记录
-                </button>
-            </div>
-            
-            <div class="card-display-area">
-                <!-- 最新卡片会动态插入到这里 -->
-                <div class="welcome-card">
-                    <div class="card-header">
-                        <i class="fas fa-info-circle"></i> 欢迎使用
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 指令输入区 -->
+            <section class="input-section">
+                <div class="input-container">
+                    <div class="input-prefix">
+                        <i class="fas fa-terminal"></i>
+                        <span class="prompt">></span>
                     </div>
-                    <div class="card-content">
-                        输入 .draw 指令开始抽取牌堆内容<br>
-                        例如: <code>.draw events</code>
+                    <input 
+                        type="text" 
+                        id="command-input" 
+                        class="command-input" 
+                        placeholder="输入 .draw 指令抽取牌堆 (例如: .draw 拼接兽)"
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
+                    <button id="execute-btn" class="execute-btn">
+                        <i class="fas fa-paper-plane"></i>
+                        执行
+                    </button>
+                </div>
+                <div class="hint">
+                    <i class="fas fa-info-circle"></i>
+                    支持 .draw 指令格式，按 Enter 键或点击执行按钮
+                </div>
+            </section>
+
+            <!-- 结果显示区 -->
+            <section class="result-section">
+                <div class="result-header">
+                    <h2><i class="fas fa-scroll"></i> 抽取结果</h2>
+                    <div class="result-controls">
+                        <button id="copy-result" class="icon-btn" title="复制结果">
+                            <i class="far fa-copy"></i>
+                        </button>
+                        <button id="clear-result" class="icon-btn" title="清空结果">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
                 </div>
-            </div>
-        </div>
+                <div id="result-display" class="result-display">
+                    <div class="welcome-message">
+                        <h3>欢迎使用跑团牌堆抽取系统</h3>
+                        <p>请输入 .draw 指令开始抽取牌堆内容</p>
+                        <div class="examples">
+                            <p><strong>示例指令：</strong></p>
+                            <code>.draw 拼接兽</code>
+                            <code>.draw 随机事件</code>
+                            <code>.draw NPC生成</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-        <!-- 历史记录 -->
-        <div class="history-section">
-            <h2><i class="fas fa-history"></i> 抽取记录 <span id="historyCount">0</span></h2>
-            <div id="historyList" class="history-list">
-                <!-- 历史记录会动态插入 -->
-            </div>
-        </div>
+            <!-- 历史记录区 -->
+            <section class="history-section">
+                <div class="history-header">
+                    <h2><i class="fas fa-history"></i> 抽取历史</h2>
+                    <div class="history-controls">
+                        <button id="clear-history" class="icon-btn" title="清空历史">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        <button id="toggle-history" class="icon-btn" title="折叠/展开">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="history-list" class="history-list">
+                    <!-- 历史记录将通过JavaScript动态添加 -->
+                </div>
+            </section>
+        </main>
 
-        <!-- 状态栏 -->
-        <div class="status-bar">
-            <div class="status-item">
-                <i class="fas fa-database"></i>
-                <span id="deckCount">加载中...</span>
+        <!-- 底部信息 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="system-info">
+                    <i class="fas fa-server"></i>
+                    <span>系统状态: <span class="status-indicator online">在线</span></span>
+                </div>
+                <div class="footer-links">
+                    <span>基于牌堆系统</span>
+                    <span>•</span>
+                    <span>静态部署版本</span>
+                </div>
             </div>
-            <div class="status-item">
-                <i class="fas fa-bolt"></i>
-                <span>在线</span>
-            </div>
-            <div class="status-item">
-                <i class="fas fa-user"></i>
-                <span id="sessionCount">0</span> 次抽取
-            </div>
-        </div>
+        </footer>
     </div>
 
-    <!-- 卡片模板 -->
-    <template id="cardTemplate">
-        <div class="result-card">
-            <div class="card-header">
-                <span class="deck-name"></span>
-                <span class="card-time"></span>
-            </div>
-            <div class="card-content"></div>
-            <div class="card-footer">
-                <i class="fas fa-hashtag"></i>
-                <span class="card-index"></span>
-            </div>
-        </div>
-    </template>
-
-    <!-- 历史记录模板 -->
-    <template id="historyTemplate">
-        <div class="history-item">
-            <span class="history-time"></span>
-            <span class="history-command"></span>
-            <span class="history-result"></span>
-        </div>
-    </template>
-
-    <script src="script.js"></script>
+    <!-- 脚本文件 -->
+    <script src="deck-manager.js"></script>
+    <script src="command-parser.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
